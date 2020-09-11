@@ -13,7 +13,7 @@ class LayoutExtension(Extension):
                            disable_layout=False)
 
     def parse(self, parser):
-        lineno = parser.stream.next().lineno
+        lineno = next(parser.stream).lineno
         template = None
         block_name = self.environment.default_layout_block
         if not parser.stream.current.test("block_end"):
