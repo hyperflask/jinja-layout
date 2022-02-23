@@ -49,7 +49,7 @@ class LayoutExtension(Extension):
                 wrap_nodes.append(node)
         if wrap_block and wrap_nodes:
             # wrap nodes which were not wrapped in a block node
-            default_block = nodes.Block(block_name, wrap_nodes, False, lineno=lineno)
+            default_block = nodes.Block(block_name, wrap_nodes, False, True, lineno=lineno)
             blocks.append(default_block)
 
         if self.environment.disable_layout:
