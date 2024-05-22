@@ -30,10 +30,6 @@ not require the use of blocks. The content which is not used in
 blocks, will be automatically wrapped in a block. The name of this
 block is defined by the second argument of the directive.
 
-You can disable the layout using the `disable_layout` attribute
-of the environemnt. This will return only the content of the
-default block.
-
 ## Example
 
 Let's consider the following layout saved as *layout.html*:

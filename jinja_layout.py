@@ -1,6 +1,5 @@
 from jinja2 import nodes, lexer
 from jinja2.ext import Extension
-import re
 
 
 class LayoutExtension(Extension):
@@ -8,9 +7,7 @@ class LayoutExtension(Extension):
 
     def __init__(self, environment):
         super(LayoutExtension, self).__init__(environment)
-        environment.extend(default_layout="layout.html",
-                           default_layout_block="content",
-                           disable_layout=False)
+        environment.extend(default_layout="layout.html", default_layout_block="content")
 
     def parse(self, parser):
         lineno = next(parser.stream).lineno
@@ -24,8 +21,8 @@ class LayoutExtension(Extension):
         if not template:
             template = nodes.Const(self.environment.default_layout)
 
-        parser.stream.skip_if('comma')
-        parser.stream.expect('block_end')
+        parser.stream.skip_if("comma")
+        parser.stream.expect("block_end")
         # parse remaining tokens until EOF
         body = parser.subparse()
         # the parser expects a TOKEN_END_BLOCK after an
@@ -52,7 +49,26 @@ class LayoutExtension(Extension):
             default_block = nodes.Block(block_name, wrap_nodes, False, True, lineno=lineno)
             blocks.append(default_block)
 
-        if self.environment.disable_layout:
-            return default_block
-
         return [nodes.Extends(template, lineno=lineno)] + blocks
+
+
+class BaseJinjaBlockAsStmtExtension(Extension):
+    def parse(self, parser):
+        lineno = parser.stream.__next__().lineno
+        body = parser.parse_statements(["name:" + self.end_tag], drop_needle=True)
+        return nodes.Block(self.block_name, body, False, lineno=lineno)
+
+
+def create_jinja_block_as_stmt_extension(name, tagname=None, classname=None):
+    """Creates a fragment extension which will just act as a replacement of the
+    block statement.
+    """
+    if tagname is None:
+        tagname = name
+    if classname is None:
+        classname = f"{name.capitalize()}BlockFragmentExtension"
+    return type(
+        classname,
+        (BaseJinjaBlockAsStmtExtension,),
+        {"tags": set([tagname]), "end_tag": "end" + tagname, "block_name": name},
+    )
