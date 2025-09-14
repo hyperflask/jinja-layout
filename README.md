@@ -1,7 +1,5 @@
 # Jinja Layout
 
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/hyperflask/sqlorm/python.yml?branch=main)
-
 Easier layouts for Jinja templates.
 
 ## Installation
