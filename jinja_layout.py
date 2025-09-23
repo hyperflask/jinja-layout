@@ -31,25 +31,31 @@ class LayoutExtension(Extension):
         parser.stream.current = lexer.Token(1, lexer.TOKEN_BLOCK_END, "%}")
         parser.stream._iter = iter([lexer.Token(1, lexer.TOKEN_EOF, "")])
 
+        macros = []
         blocks = []
         wrap_block = True
         wrap_nodes = []
-        default_block = None
         # extracts blocks node out of the body
         for node in body:
             if isinstance(node, nodes.Block):
                 if node.name == block_name:
                     wrap_block = False
-                    default_block = node
                 blocks.append(node)
+            elif isinstance(node, nodes.Macro):
+                # we don't keep macros in blocks
+                macros.append(node)
             else:
                 wrap_nodes.append(node)
+        if not wrap_block and wrap_nodes:
+            parser.fail(
+                f"Cannot have non-block content in use_layout when a block named '{block_name}' is defined.",
+                lineno=lineno,
+            )
         if wrap_block and wrap_nodes:
             # wrap nodes which were not wrapped in a block node
-            default_block = nodes.Block(block_name, wrap_nodes, False, True, lineno=lineno)
-            blocks.append(default_block)
+            blocks.append(nodes.Block(block_name, wrap_nodes, False, True, lineno=lineno))
 
-        return [nodes.Extends(template, lineno=lineno)] + blocks
+        return [nodes.Extends(template, lineno=lineno)] + macros + blocks
 
 
 class BaseJinjaBlockAsStmtExtension(Extension):
