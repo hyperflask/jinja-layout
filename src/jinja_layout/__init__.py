@@ -46,11 +46,6 @@ class LayoutExtension(Extension):
                 macros.append(node)
             else:
                 wrap_nodes.append(node)
-        if not wrap_block and wrap_nodes:
-            parser.fail(
-                f"Cannot have non-block content in use_layout when a block named '{block_name}' is defined.",
-                lineno=lineno,
-            )
         if wrap_block and wrap_nodes:
             # wrap nodes which were not wrapped in a block node
             blocks.append(nodes.Block(block_name, wrap_nodes, False, True, lineno=lineno))
